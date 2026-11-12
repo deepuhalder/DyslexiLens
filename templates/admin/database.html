@@ -1,0 +1,58 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<section class="panel-card">
+  <div class="activity-toolbar">
+    <nav class="table-tabs">
+      {% for t in tables %}
+      <a href="{{ url_for('admin_database', table=t) }}" class="table-tab {{ 'is-active' if t == table }}">{{
+        t.replace('_', ' ') }}</a>
+      {% endfor %}
+    </nav>
+    <form method="GET" action="{{ url_for('admin_database') }}" class="filter-form">
+      <input type="hidden" name="table" value="{{ table }}">
+      <input type="text" name="q" value="{{ search }}" placeholder="Search" class="form-input filter-input"
+        aria-label="Search rows">
+      <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+      <a href="{{ url_for('admin_database', table=table) }}" class="btn btn-secondary btn-sm">Clear</a>
+    </form>
+  </div>
+
+  <p class="table-count">{{ total }} row{{ '' if total == 1 else 's' }}, page {{ page }} of {{ pages }}</p>
+
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>{% for col in columns %}<th>{{ col }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          {% for col in columns %}
+          {% if col in hidden_columns.get(table, []) or col in ('password', 'token') %}
+          <td class="hidden-value">hidden</td>
+          {% else %}
+          <td>{{ row[col] if row[col] is not none else '' }}</td>
+          {% endif %}
+          {% endfor %}
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="{{ columns|length }}">No rows.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pager">
+    {% if page > 1 %}
+    <a class="btn btn-secondary btn-sm"
+      href="{{ url_for('admin_database', table=table, page=page-1, q=search) }}">Previous</a>
+    {% endif %}
+    {% if page < pages %} <a class="btn btn-secondary btn-sm"
+      href="{{ url_for('admin_database', table=table, page=page+1, q=search) }}">Next</a>
+      {% endif %}
+  </div>
+</section>
+{% endblock %}

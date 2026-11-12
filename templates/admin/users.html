@@ -1,0 +1,54 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<section class="panel-card">
+  <h2>Users</h2>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th><th>Username</th><th>Email</th><th>Joined</th><th>Last login</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u['first_name'] or '—' }}</td>
+        <td>{{ u['username'] }}{% if u['is_admin'] %} <span class="admin-tag">admin</span>{% endif %}</td>
+        <td>{{ u['email'] }}</td>
+        <td>{{ u['created_at'][:10] if u['created_at'] else '' }}</td>
+        <td>{{ u['last_login'] or 'Never' }}</td>
+        <td>{{ u['status'] }}</td>
+        <td class="admin-actions">
+          {% if u['id'] != session.get('user_id') %}
+          <form method="POST" action="{{ url_for('admin_user_status', user_id=u['id']) }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="{{ 'unblock' if u['status'] == 'blocked' else 'block' }}">
+            <button type="submit" class="btn btn-secondary btn-sm">{{ 'Unblock' if u['status'] == 'blocked' else 'Block' }}</button>
+          </form>
+          <button type="button" class="btn btn-secondary btn-sm" data-toggle-reset="{{ u['id'] }}">Reset password</button>
+          <button type="button" class="btn btn-danger btn-sm" data-toggle-delete="{{ u['id'] }}">Delete</button>
+
+          <form method="POST" action="{{ url_for('admin_user_reset_password', user_id=u['id']) }}" class="admin-popover" id="reset-form-{{ u['id'] }}" hidden>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="form-label" for="new-password-{{ u['id'] }}">New password</label>
+            <input type="text" id="new-password-{{ u['id'] }}" name="new_password" class="form-input" required>
+            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+          </form>
+
+          <form method="POST" action="{{ url_for('admin_user_delete', user_id=u['id']) }}" class="admin-popover" id="delete-form-{{ u['id'] }}" hidden
+                data-confirm="Delete this user and all their data? This cannot be undone.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <p class="admin-popover-note">Delete {{ u['username'] }} and all their data?</p>
+            <button type="submit" class="btn btn-danger btn-sm">Yes, delete</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-toggle-delete="{{ u['id'] }}">Cancel</button>
+          </form>
+          {% else %}
+          <span class="admin-self-note">This is your account</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

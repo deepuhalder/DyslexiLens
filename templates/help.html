@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Help – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-container narrow help-page">
+  <section class="overview-heading">
+    <h1>Help</h1>
+    <p>How to use DyslexiLens with the mouse, the keyboard or your voice.</p>
+  </section>
+
+  <section class="panel-card">
+    <h2>Reading a document</h2>
+    <ol class="help-steps">
+      <li>Choose a PDF, JPG or PNG file and press <strong>Scan</strong>, or press <strong>Use sample text</strong>.</li>
+      <li>Check the text. Fix any scanning mistakes, then press <strong>Read this text</strong>.</li>
+      <li>Change the font size, spacing or background. Press <strong>Read whole text</strong> to listen.</li>
+      <li>Click a tinted word to see its syllables and hear it slowly.</li>
+      <li>Turn on <strong>One sentence at a time</strong> to read one sentence on its own. The app remembers where you stopped.</li>
+    </ol>
+  </section>
+
+  <section class="panel-card">
+    <h2>Voice commands</h2>
+    <p>After logging in, press the <strong>Voice</strong> button at the bottom right or press <kbd>V</kbd>, then say one command. Say <strong>help</strong> to hear this list.</p>
+    <table class="help-table">
+      <thead><tr><th>Say</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>go home, open settings, open profile, open writing pad, help</td><td>Opens that page</td></tr>
+        <tr><td>use sample text, read this text, recent documents</td><td>Loads text into the reader</td></tr>
+        <tr><td>upload</td><td>Moves to the file chooser (choosing a file needs a click)</td></tr>
+        <tr><td>read aloud, read in syllables, pause, stop</td><td>Controls reading aloud</td></tr>
+        <tr><td>sentence mode on, sentence mode off, next sentence, previous sentence, read sentence</td><td>One sentence at a time</td></tr>
+        <tr><td>bigger text, smaller text</td><td>Changes the reading font size</td></tr>
+        <tr><td>zoom in, zoom out, normal size</td><td>Changes the size of the whole page</td></tr>
+        <tr><td>peach, cream, yellow or turquoise background</td><td>Changes the reading background</td></tr>
+        <tr><td>magnifier on, magnifier off</td><td>Shows the line under the mouse larger</td></tr>
+        <tr><td>voice guide on, voice guide off</td><td>Turns spoken page names and messages on or off</td></tr>
+        <tr><td>log out</td><td>Logs you out</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel-card">
+    <h2>Keyboard shortcuts</h2>
+    <p>Shortcuts work when you are not typing in a box.</p>
+    <table class="help-table">
+      <thead><tr><th>Key</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>V</kbd></td><td>Speak a voice command</td></tr>
+        <tr><td><kbd>R</kbd></td><td>Read aloud, or pause and resume (in sentence mode: read the sentence)</td></tr>
+        <tr><td><kbd>S</kbd></td><td>Read in syllables</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Stop reading</td></tr>
+        <tr><td><kbd>N</kbd> and <kbd>P</kbd></td><td>Next and previous sentence (sentence mode)</td></tr>
+        <tr><td><kbd>+</kbd> <kbd>-</kbd> <kbd>0</kbd></td><td>Page bigger, smaller, normal size</td></tr>
+        <tr><td><kbd>H</kbd></td><td>Open this help page</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel-card">
+    <h2>Logging in with your voice</h2>
+    <p>On the login page, press Enter or click <strong>Start</strong>. The app asks if you want to use your voice. Say <strong>yes</strong>, then say your username. The app spells it back to check it. For your safety, the password is always typed, never spoken.</p>
+  </section>
+
+  <section class="panel-card">
+    <h2>Writing pad</h2>
+    <p>Open <strong>Writing pad</strong> from the menu. Type, or press <strong>Dictate</strong> and speak. Spelling mistakes are underlined by the browser. Press <strong>Read back</strong> to hear what you wrote, or <strong>Download</strong> to save it as a text file. Your draft is kept in this browser until you clear it.</p>
+  </section>
+
+  <section class="panel-card">
+    <h2>Good to know</h2>
+    <ul class="help-list">
+      <li>Listening to your voice works in Google Chrome and Microsoft Edge. It needs the internet and permission to use the microphone.</li>
+      <li>Browsers do not let a website speak until you click or press a key once on the page.</li>
+      <li>Reading aloud uses your browser's own voice, so it can sound different on another computer.</li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

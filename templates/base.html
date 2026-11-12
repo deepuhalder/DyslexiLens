@@ -1,0 +1,161 @@
+{% macro eye_toggle(target) -%}
+<button type="button" class="pw-eye" data-eye-target="{{ target }}" aria-label="Show password" aria-pressed="false">
+  <svg class="pw-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+  <svg class="pw-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+    <line x1="1" y1="1" x2="23" y2="23"></line>
+  </svg>
+</button>
+{%- endmacro %}
+
+<!DOCTYPE html>
+{%- set zoom = user_prefs.page_zoom if user_prefs else 100 -%}
+<html lang="en"
+      data-logged-in="{{ '1' if session.get('user_id') else '0' }}"
+      data-user="{{ session.get('user_id') or '' }}"
+      data-zoom="{{ zoom }}"
+      data-voice-guide="{{ user_prefs.voice_guide if user_prefs else 0 }}"
+      style="font-size: {{ zoom }}%">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}DyslexiLens{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2323395D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E">
+
+  <!-- Lexend font is stored in static/fonts (loaded by style.css), so it works offline -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20">
+  <meta name="csrf-token" content="{{ csrf_token() if csrf_token is defined else '' }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Main navigation bar (light, formal) -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="{{ url_for('home' if session.get('user_id') else 'index') }}" class="logo-container" aria-label="DyslexiLens Home">
+        <div class="logo-icon-wrap" aria-hidden="true">
+          <!-- Minimal clean line SVG lens icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <div class="logo-title">
+          Dyslexi<span>Lens</span>
+        </div>
+      </a>
+
+      <!-- Navigation Actions -->
+      <nav class="nav-actions" aria-label="Main">
+        <!-- Page zoom: makes the WHOLE page bigger or smaller (100% to 150%) -->
+        <div class="zoom-controls" role="group" aria-label="Page zoom">
+          <button type="button" class="zoom-btn" id="zoom-out" aria-label="Make the page smaller" title="Smaller (minus key)">A&minus;</button>
+          <button type="button" class="zoom-btn" id="zoom-reset" aria-label="Normal page size" title="Normal size (0 key)">A</button>
+          <button type="button" class="zoom-btn" id="zoom-in" aria-label="Make the page bigger" title="Bigger (plus key)">A+</button>
+        </div>
+        {% if session.get('user_id') %}
+          <!-- Profile menu: first name, Settings / Profile / Log out (+ Admin panel) -->
+          <div class="profile-menu" id="profile-menu">
+            <button type="button" class="profile-menu-btn" id="profile-menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="profile-dropdown">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span id="header-user-name">{{ session.get('display_name') or session.get('username') }}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="profile-dropdown" id="profile-dropdown" role="menu" aria-label="Profile menu">
+              <div class="profile-dropdown-greeting">
+                <span class="profile-name">{{ session.get('display_name') or session.get('username') }}</span>
+                <span class="profile-hint">{{ session.get('email') or '' }}</span>
+              </div>
+              <a href="{{ url_for('home') }}" class="profile-link" role="menuitem">Reader</a>
+              <a href="{{ url_for('write_page') }}" class="profile-link" role="menuitem">Writing pad</a>
+              <a href="{{ url_for('settings_page') }}" class="profile-link" role="menuitem">Settings</a>
+              <a href="{{ url_for('profile_page') }}" class="profile-link" role="menuitem">Profile</a>
+              <a href="{{ url_for('help_page') }}" class="profile-link" role="menuitem">Help</a>
+              {% if session.get('is_admin') %}
+              <a href="{{ url_for('admin_dashboard') }}" class="profile-link" role="menuitem">Admin panel</a>
+              {% endif %}
+              <a href="{{ url_for('logout') }}" class="profile-logout" role="menuitem" id="profile-logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Log out
+              </a>
+            </div>
+          </div>
+        {% else %}
+          <a href="{{ url_for('help_page') }}" class="btn btn-ghost" id="nav-help">Help</a>
+          <a href="{{ url_for('login') }}" class="btn btn-ghost" id="nav-login">Log in</a>
+          <a href="{{ url_for('signup') }}" class="btn btn-primary" id="nav-signup">Sign up</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="main-wrapper" id="main-content" tabindex="-1">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash-banner flash-{{ category }}" role="alert">
+              {% if category == 'success' %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              {% elif category == 'error' %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              {% else %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              {% endif %}
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if session.get('user_id') %}
+  <!-- Voice commands: click the button or press V, then speak (see voice.js) -->
+  <button type="button" class="voice-fab" id="voice-command-btn" aria-label="Voice command. Press V to speak a command">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+      <path d="M5 10v1a7 7 0 0 0 14 0v-1"></path>
+      <line x1="12" y1="18" x2="12" y2="22"></line>
+    </svg>
+    <span>Voice</span>
+  </button>
+  {% endif %}
+  <!-- Spoken/visual status for voice features (screen readers announce it too) -->
+  <div class="voice-status" id="voice-status" role="status" aria-live="polite" hidden></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20"></script>
+  <script src="{{ url_for('static', filename='js/voice.js') }}?v=20"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

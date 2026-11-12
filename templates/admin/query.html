@@ -1,0 +1,36 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<section class="panel-card">
+  <h2>Run a SELECT query</h2>
+  <p class="form-hint">Read-only. INSERT, UPDATE, DELETE and other write statements are rejected, and the query runs on a read-only connection.</p>
+
+  <form method="POST" action="{{ url_for('admin_query') }}" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group">
+      <textarea name="query" id="sql-query" class="review-textarea sql-input" rows="4" placeholder="SELECT username, email FROM users LIMIT 10">{{ sql }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Run query</button>
+  </form>
+
+  {% if error %}
+  <div class="flash-banner flash-error" role="alert"><span>{{ error }}</span></div>
+  {% endif %}
+
+  {% if results is not none %}
+  <p class="table-count">{{ results|length }} row{{ '' if results|length == 1 else 's' }} (max 100)</p>
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for row in results %}
+        <tr>{% for c in columns %}{% if c|lower in ('password', 'token') %}<td class="hidden-value">hidden</td>{% else %}<td>{{ row[c] }}</td>{% endif %}{% endfor %}</tr>
+        {% else %}
+        <tr><td colspan="{{ columns|length if columns else 1 }}">No rows.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

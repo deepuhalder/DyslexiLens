@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Log in – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-panel">
+    <div class="auth-header">
+      <h1>Log in</h1>
+    </div>
+
+    <!-- Voice guide: asks if the user wants to log in by voice (see voice.js).
+         Browsers block sound until the user clicks or presses a key, so the
+         guide only starts after "Start" is pressed. -->
+    <section class="voice-card" id="voice-login-card" aria-labelledby="voice-card-title">
+      <h2 class="voice-card-title" id="voice-card-title">Voice guide</h2>
+      <p class="voice-card-text" id="voice-card-text">Press Enter or click Start to hear the login steps.</p>
+      <div class="voice-card-actions" id="voice-card-start">
+        <button type="button" class="btn btn-primary" id="voice-start-btn">Start</button>
+        <button type="button" class="btn btn-secondary" id="voice-skip-btn">Type instead</button>
+      </div>
+      <div class="voice-card-actions" id="voice-card-choice" hidden>
+        <button type="button" class="btn btn-primary" id="voice-yes-btn">Use my voice</button>
+        <button type="button" class="btn btn-secondary" id="voice-no-btn">Type instead</button>
+      </div>
+      <p class="voice-card-heard" id="voice-card-heard" hidden></p>
+    </section>
+
+    <form method="POST" action="{{ url_for('login') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <!-- Set to 1 by voice.js when the user logs in with the voice guide -->
+      <input type="hidden" name="voice_mode" id="voice-mode-field" value="0">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-input"
+          value="{{ username or '' }}"
+          required
+          autocomplete="username"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="pw-field">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            required
+            autocomplete="current-password"
+          >
+          {{ eye_toggle('#password') }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" id="login-submit-btn">
+        Log in
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <a href="{{ url_for('forgot_password') }}" id="link-forgot">Forgot password?</a>
+      &nbsp;&nbsp;
+      <a href="{{ url_for('help_page') }}" id="link-help">Help</a>
+    </div>
+    <div class="auth-footer">
+      New here? <a href="{{ url_for('signup') }}" id="link-to-signup">Sign up</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

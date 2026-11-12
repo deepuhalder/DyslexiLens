@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}DyslexiLens – reading help for dyslexia{% endblock %}
+
+{% block content %}
+<div class="landing-container">
+  <section class="landing-hero">
+    <h1>Reading help for dyslexia</h1>
+    <p>Scan a page or a PDF, then read it with larger text, wider spacing, syllable help and read aloud. You can also use the site with your voice.</p>
+    <div class="landing-actions">
+      <a href="{{ url_for('login') }}" class="btn btn-primary" id="landing-login">Log in</a>
+      <a href="{{ url_for('signup') }}" class="btn btn-secondary" id="landing-signup">Sign up</a>
+    </div>
+  </section>
+
+  <section class="landing-steps" aria-label="How it works">
+    <div class="landing-step">
+      <span class="step-number">1</span>
+      <h2>Scan</h2>
+      <p>Upload a PDF, JPG or PNG. The text is taken out of it, and you can check and correct it.</p>
+    </div>
+    <div class="landing-step">
+      <span class="step-number">2</span>
+      <h2>Read</h2>
+      <p>Change the font size, spacing and background. Hard words are tinted and split into syllables.</p>
+    </div>
+    <div class="landing-step">
+      <span class="step-number">3</span>
+      <h2>Listen</h2>
+      <p>Hear the whole text, one sentence, or one word slowly. Speed can be changed.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

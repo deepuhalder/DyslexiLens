@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Reader – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+  <!-- Simple heading + small stats row (no banner card) -->
+  <section class="overview-heading">
+    <h1>Hi, {{ user|display_name }}</h1>
+    <div class="progress-chips" aria-label="Your progress">
+      <div class="progress-chip">
+        <span class="chip-label">Documents read</span>
+        <span class="chip-value" id="stat-documents">{{ documents_read }}</span>
+      </div>
+      <div class="progress-chip">
+        <span class="chip-label">Words read aloud</span>
+        <span class="chip-value" id="stat-words">{{ words_spoken }}</span>
+      </div>
+      <div class="progress-chip">
+        <span class="chip-label">Hard words practised</span>
+        <span class="chip-value" id="stat-practised">{{ words_practised }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- First-time hint: shows once, dismissible, never again (localStorage) -->
+  <div class="first-time-hint" id="first-time-hint" hidden>
+    <span class="hint-steps">1. Upload a file &nbsp;&rarr;&nbsp; 2. Check the text &nbsp;&rarr;&nbsp; 3. Read or listen</span>
+    <button type="button" class="hint-dismiss" id="hint-dismiss" aria-label="Dismiss the hint">Dismiss</button>
+  </div>
+
+  <!-- Upload / Scan -->
+  <section class="upload-panel">
+    <div class="panel-header">
+      <div class="panel-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <h2>Upload a PDF or image</h2>
+      </div>
+      <span class="panel-count">PDF, JPG or PNG, up to 10 MB</span>
+    </div>
+
+    <form id="upload-doc-form" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+      <div class="upload-zone" id="upload-drop-zone">
+        <div class="upload-form-row">
+          <input type="file" id="document-file-input" name="document" accept=".pdf,.jpg,.jpeg,.png" class="file-input-custom" required>
+          <button type="submit" class="btn btn-primary" id="btn-extract-doc">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Scan
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-sample-doc">Use sample text</button>
+          <span class="recent-docs">
+            <button type="button" class="btn btn-secondary" id="btn-recent-docs" aria-haspopup="true" aria-expanded="false" aria-controls="recent-docs-menu">
+              Recent documents
+            </button>
+            <div class="recent-docs-menu" id="recent-docs-menu" role="menu" aria-label="Recent documents">
+              <div class="recent-empty">Loading...</div>
+            </div>
+          </span>
+        </div>
+      </div>
+
+      <!-- Scanning loading indicator -->
+      <div class="extraction-status" id="extraction-status" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <span id="status-message">Scanning...</span>
+      </div>
+
+      <!-- Review step: fix scanning mistakes before reading -->
+      <div class="review-panel" id="review-panel">
+        <div class="review-header">
+          <span class="review-title" id="review-title">Check the text</span>
+          <span class="review-hint">Fix any scanning mistakes here, then continue.</span>
+        </div>
+        <textarea class="review-textarea" id="review-textarea" aria-label="Review and edit the extracted text"></textarea>
+        <div class="review-actions">
+          <button type="button" class="btn btn-primary" id="btn-use-text">Read this text</button>
+          <button type="button" class="btn btn-secondary" id="btn-dismiss-review">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- Reader: audio controls, then live controls, then the text -->
+  <section class="workspace-panel">
+    <div class="panel-header">
+      <div class="panel-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 5 6 9H2v6h4l5 4z"></path>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <h2>Reader</h2>
+      </div>
+      <span class="panel-count" id="reader-doc-name">No document loaded</span>
+    </div>
+
+    <!-- Read-aloud bar -->
+    <div class="audio-bar" id="audio-bar">
+      <span class="audio-bar-label">Listen</span>
+      <button type="button" class="audio-btn" id="btn-read-whole">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        Read whole text
+      </button>
+      <button type="button" class="audio-btn" id="btn-read-syllables">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="9" x2="4" y2="15"></line>
+          <line x1="9" y1="5" x2="9" y2="19"></line>
+          <line x1="14" y1="8" x2="14" y2="16"></line>
+          <line x1="19" y1="11" x2="19" y2="13"></line>
+        </svg>
+        Read in syllables
+      </button>
+      <button type="button" class="audio-btn" id="btn-pause" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="6" y="4" width="4" height="16"></rect>
+          <rect x="14" y="4" width="4" height="16"></rect>
+        </svg>
+        <span>Pause</span>
+      </button>
+      <button type="button" class="audio-btn" id="btn-stop" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+        </svg>
+        Stop
+      </button>
+      <span class="audio-speed">
+        <label for="speech-rate">Speed</label>
+        <input type="range" id="speech-rate" min="0.5" max="2" step="0.1" value="1" aria-label="Speech speed">
+        <span class="speed-value" id="speech-rate-val">1.0&times;</span>
+      </span>
+    </div>
+
+    <!-- Live reading controls -->
+    <div class="sliders-grid">
+      <div class="slider-control-item">
+        <div class="slider-header-row">
+          <label for="font-size-slider" class="slider-label">Font Size</label>
+          <span id="font-size-val" class="slider-value-pill">24px</span>
+        </div>
+        <input type="range" id="font-size-slider" class="range-slider" min="14" max="32" value="24" step="1" aria-label="Adjust font size">
+      </div>
+
+      <div class="slider-control-item">
+        <div class="slider-header-row">
+          <label for="letter-spacing-slider" class="slider-label">Letter Spacing</label>
+          <span id="letter-spacing-val" class="slider-value-pill">0.02em</span>
+        </div>
+        <input type="range" id="letter-spacing-slider" class="range-slider" min="0" max="0.15" value="0.02" step="0.005" aria-label="Adjust letter spacing">
+      </div>
+
+      <div class="slider-control-item">
+        <div class="slider-header-row">
+          <label for="line-spacing-slider" class="slider-label">Line Spacing</label>
+          <span id="line-spacing-val" class="slider-value-pill">1.50x</span>
+        </div>
+        <input type="range" id="line-spacing-slider" class="range-slider" min="1.4" max="2.6" value="1.5" step="0.05" aria-label="Adjust line spacing">
+      </div>
+
+      <div class="slider-control-item">
+        <div class="slider-header-row">
+          <span class="slider-label" id="bg-selector-label">Background</span>
+        </div>
+        <div class="bg-selector" role="group" aria-labelledby="bg-selector-label">
+          <button type="button" class="bg-swatch is-active" data-bg="peach" title="Peach (default)" aria-label="Peach background" aria-pressed="true"></button>
+          <button type="button" class="bg-swatch" data-bg="cream" title="Cream" aria-label="Cream background" aria-pressed="false"></button>
+          <button type="button" class="bg-swatch" data-bg="yellow" title="Soft Yellow" aria-label="Soft yellow background" aria-pressed="false"></button>
+          <button type="button" class="bg-swatch" data-bg="turquoise" title="Soft Turquoise" aria-label="Soft turquoise background" aria-pressed="false"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reading options (the text itself never moves) -->
+    <div class="settings-toggle-strip">
+      <label class="switch-control">
+        <input type="checkbox" id="toggle-magnifier">
+        <span class="switch-slider" aria-hidden="true"></span>
+        <span class="switch-text">Magnifier: show the line under the mouse larger</span>
+      </label>
+      <label class="switch-control">
+        <input type="checkbox" id="toggle-sentence-mode">
+        <span class="switch-slider" aria-hidden="true"></span>
+        <span class="switch-text">One sentence at a time</span>
+      </label>
+    </div>
+
+    <!-- Reading text (starts empty: a fresh workspace each visit) -->
+    <div class="reading-preview-wrapper">
+      <!-- Magnifier strip: mirrors the line under the mouse ~1.5x (see main.js) -->
+      <div id="line-magnifier-strip" aria-hidden="true"><span class="magnifier-line"></span></div>
+      <div
+        class="reading-sandbox"
+        id="reading-preview"
+        contenteditable="true"
+        spellcheck="false"
+        data-document-id=""
+        data-filename=""
+        aria-label="Reading text. Paste or scan a document, then read here."
+        title="Your scanned text appears here. You can also paste text directly."
+      ><span class="sandbox-placeholder">Your scanned text will appear here.
+
+Use "Scan" above, try the sample text, or paste text straight into this box.</span></div>
+    </div>
+
+    <!-- One sentence at a time (see main.js, section 2c). Uses the same font,
+         spacing and background as the reader. -->
+    <div class="sentence-view" id="sentence-view" hidden>
+      <p class="sentence-position" id="sentence-position" aria-live="polite"></p>
+      <div class="reading-sandbox sentence-text" id="sentence-text"></div>
+      <div class="sentence-controls">
+        <button type="button" class="btn btn-secondary" id="sentence-prev">Previous</button>
+        <button type="button" class="btn btn-primary" id="sentence-read">Read this sentence</button>
+        <button type="button" class="btn btn-secondary" id="sentence-next">Next</button>
+      </div>
+      <p class="sentence-hint">Keyboard: N for next, P for previous, R to read.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Saved reader preferences are injected here as JSON for main.js -->
+<script type="application/json" id="settings-boot">{{ settings|tojson }}</script>
+{% endblock %}

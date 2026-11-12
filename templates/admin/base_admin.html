@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Admin – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <section class="overview-heading">
+    <h1>Admin</h1>
+    <nav class="admin-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link {{ 'is-active' if request.path == '/admin' }}">Dashboard</a>
+      <a href="{{ url_for('admin_users') }}" class="admin-nav-link {{ 'is-active' if request.path == '/admin/users' }}">Users</a>
+      <a href="{{ url_for('admin_activity') }}" class="admin-nav-link {{ 'is-active' if request.path == '/admin/activity' }}">Activity log</a>
+      <a href="{{ url_for('admin_database') }}" class="admin-nav-link {{ 'is-active' if request.path.startswith('/admin/database') }}">Database</a>
+      <a href="{{ url_for('admin_query') }}" class="admin-nav-link {{ 'is-active' if request.path == '/admin/query' }}">SQL</a>
+    </nav>
+  </section>
+
+  {% block admin_content %}{% endblock %}
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<section class="admin-stats">
+  <div class="progress-chip">
+    <span class="chip-label">Total users</span>
+    <span class="chip-value">{{ total_users }}</span>
+  </div>
+  <div class="progress-chip">
+    <span class="chip-label">Documents scanned</span>
+    <span class="chip-value">{{ total_docs }}</span>
+  </div>
+  <div class="progress-chip">
+    <span class="chip-label">Logins today</span>
+    <span class="chip-value">{{ logins_today }}</span>
+  </div>
+  <div class="progress-chip">
+    <span class="chip-label">Active users today</span>
+    <span class="chip-value">{{ week_users }}</span>
+  </div>
+</section>
+
+<section class="panel-card">
+  <h2>Recent activity</h2>
+  <table class="admin-table">
+    <thead>
+      <tr><th>User</th><th>Event</th><th>When</th></tr>
+    </thead>
+    <tbody>
+      {% for row in recent %}
+      <tr>
+        <td>{{ row['username'] or '—' }}</td>
+        <td>{{ row['event'] }}</td>
+        <td>{{ row['created_at'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3">No activity yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

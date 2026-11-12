@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-panel">
+    <div class="auth-header">
+      <h1>Sign up</h1>
+    </div>
+
+    <form method="POST" action="{{ url_for('signup') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label for="first_name" class="form-label">First name</label>
+        <input
+          type="text"
+          id="first_name"
+          name="first_name"
+          class="form-input"
+          value="{{ first_name or '' }}"
+          required
+          autocomplete="given-name"
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-input"
+          value="{{ username or '' }}"
+          required
+          autocomplete="username"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-input"
+          value="{{ email or '' }}"
+          required
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="pw-field">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            required
+            autocomplete="new-password"
+          >
+          {{ eye_toggle('#password') }}
+        </div>
+        <span class="form-hint">At least 8 characters, with a letter and a number.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm_password" class="form-label">Confirm password</label>
+        <div class="pw-field">
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            class="form-input"
+            required
+            autocomplete="new-password"
+          >
+          {{ eye_toggle('#confirm_password') }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" id="signup-submit-btn">
+        Create account
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="{{ url_for('login') }}" id="link-to-login">Log in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

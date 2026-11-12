@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Writing pad – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-container narrow">
+  <section class="overview-heading">
+    <h1>Writing pad</h1>
+    <p>Type or speak. Spelling mistakes are underlined, and you can hear what you wrote.</p>
+  </section>
+
+  <section class="panel-card write-panel">
+    <div class="write-toolbar" role="toolbar" aria-label="Writing tools">
+      <button type="button" class="btn btn-primary" id="write-dictate">Dictate</button>
+      <button type="button" class="btn btn-secondary" id="write-read-back">Read back</button>
+      <button type="button" class="btn btn-secondary" id="write-stop">Stop</button>
+      <button type="button" class="btn btn-secondary" id="write-download">Download</button>
+      <button type="button" class="btn btn-secondary" id="write-to-reader">Open in reader</button>
+      <button type="button" class="btn btn-secondary" id="write-clear">Clear</button>
+    </div>
+    <p class="write-status" id="write-status" role="status" aria-live="polite"></p>
+
+    <!-- spellcheck="true": the browser underlines spelling mistakes -->
+    <label for="write-area" class="slider-label">Your text</label>
+    <textarea id="write-area" class="write-area" spellcheck="true" lang="en"
+              placeholder="Start typing here, or press Dictate and speak."></textarea>
+    <p class="write-count" id="write-count">0 words</p>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/write.js') }}?v=20"></script>
+{% endblock %}

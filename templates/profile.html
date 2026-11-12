@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Profile – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <section class="overview-heading">
+    <h1>Profile</h1>
+  </section>
+
+  <section class="panel-card">
+    <h2>Your details</h2>
+    <form method="POST" action="{{ url_for('profile_update') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label for="first_name" class="form-label">First name</label>
+        <input type="text" id="first_name" name="first_name" class="form-input" value="{{ user['first_name'] }}" required>
+      </div>
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" class="form-input" value="{{ user['username'] }}" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" value="{{ user['email'] }}" required autocomplete="email">
+      </div>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
+  </section>
+
+  <section class="panel-card">
+    <h2>Change password</h2>
+    <form method="POST" action="{{ url_for('profile_password') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label for="current_password" class="form-label">Current password</label>
+        <div class="pw-field">
+          <input type="password" id="current_password" name="current_password" class="form-input" required autocomplete="current-password">
+          {{ eye_toggle('#current_password') }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="new_password" class="form-label">New password</label>
+        <div class="pw-field">
+          <input type="password" id="new_password" name="new_password" class="form-input" required autocomplete="new-password">
+          {{ eye_toggle('#new_password') }}
+        </div>
+        <span class="form-hint">At least 8 characters, with a letter and a number.</span>
+      </div>
+      <div class="form-group">
+        <label for="confirm_password" class="form-label">Confirm new password</label>
+        <div class="pw-field">
+          <input type="password" id="confirm_password" name="confirm_password" class="form-input" required autocomplete="new-password">
+          {{ eye_toggle('#confirm_password') }}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Change password</button>
+    </form>
+  </section>
+
+  <section class="panel-card danger-zone">
+    <h2>Delete account</h2>
+    <p>This removes your account, your documents and your settings. It cannot be undone.</p>
+    <button type="button" class="btn btn-danger" id="btn-delete-account">Delete my account</button>
+
+    <div class="confirm-box" id="delete-confirm-box" hidden>
+      <p>Are you sure? Enter your password to delete your account.</p>
+      <form method="POST" action="{{ url_for('profile_delete') }}" id="delete-account-form" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label for="delete_password" class="form-label">Password</label>
+          <input type="password" id="delete_password" name="password" class="form-input" required autocomplete="current-password">
+        </div>
+        <div class="review-actions">
+          <button type="submit" class="btn btn-danger">Delete my account</button>
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

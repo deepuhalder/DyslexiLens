@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Not allowed – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-panel">
+    <div class="auth-header">
+      <h1>Not allowed</h1>
+    </div>
+    <p>You don't have access to that page.</p>
+    <a href="{{ url_for('home' if session.get('user_id') else 'index') }}" class="btn btn-primary btn-full">Go home</a>
+  </div>
+</div>
+{% endblock %}

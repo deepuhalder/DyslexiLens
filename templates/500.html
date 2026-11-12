@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Something went wrong – DyslexiLens{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-panel">
+    <div class="auth-header">
+      <h1>Something went wrong</h1>
+    </div>
+    <p>That didn't work. Please try again.</p>
+    <a href="{{ url_for('home' if session.get('user_id') else 'index') }}" class="btn btn-primary btn-full">Go home</a>
+  </div>
+</div>
+{% endblock %}

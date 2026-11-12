@@ -1,0 +1,35 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<section class="panel-card">
+  <div class="activity-toolbar">
+    <form method="GET" action="{{ url_for('admin_activity') }}" class="filter-form">
+      <input type="text" name="user" value="{{ filter_user }}" placeholder="Filter by user" class="form-input filter-input" aria-label="Filter by user">
+      <input type="date" name="date" value="{{ filter_date }}" class="form-input filter-input" aria-label="Filter by date">
+      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+      <a href="{{ url_for('admin_activity') }}" class="btn btn-secondary btn-sm">Clear</a>
+    </form>
+    <a href="{{ url_for('admin_activity_export') }}" class="btn btn-primary btn-sm" id="activity-export-btn">Download as Excel</a>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr><th>Username</th><th>Event</th><th>IP</th><th>Session duration</th><th>Details</th><th>Date &amp; time</th></tr>
+    </thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td>{{ e['username'] or '—' }}</td>
+        <td>{{ e['event'] }}</td>
+        <td>{{ e['ip_address'] or '—' }}</td>
+        <td>{{ e['session_duration'] or '—' }}</td>
+        <td>{{ e['details'] or '' }}</td>
+        <td>{{ e['created_at'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No matching events.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
